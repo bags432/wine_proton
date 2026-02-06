@@ -569,7 +569,9 @@ static void sync_window_style( struct x11drv_win_data *data )
         int mask = get_window_attributes( data, &attr );
 
         XChangeWindowAttributes( data->display, data->whole_window, mask, &attr );
+    #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
         x11drv_xinput2_enable( data->display, data->whole_window );
+    #endif
     }
 }
 
@@ -2496,7 +2498,9 @@ static void create_whole_window( struct x11drv_win_data *data )
 
     /* Set override-redirect attribute only after window creation, Mutter gets confused otherwise */
     window_set_managed( data, is_window_managed( data->hwnd, SWP_NOACTIVATE, FALSE ), FALSE );
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
     x11drv_xinput2_enable( data->display, data->whole_window );
+#endif
     set_initial_wm_hints( data->display, data->whole_window );
     set_wm_hints( data, 0 );
 
@@ -2815,9 +2819,11 @@ BOOL X11DRV_CreateWindow( HWND hwnd )
             TRACE( "winstation name %s.\n", debugstr_w(winstation_name) );
             if (!wcscmp( winstation_name, winsta0 ))
             {
+            #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
                 /* listen to raw xinput event in the desktop window thread */
                 data->xinput2_rawinput = TRUE;
                 x11drv_xinput2_enable( data->display, DefaultRootWindow( data->display ) );
+            #endif
             }
         }
         /* create the cursor clipping window */
