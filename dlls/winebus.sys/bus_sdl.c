@@ -1094,14 +1094,16 @@ NTSTATUS sdl_bus_init(void *args)
     const char *mapping;
     int i;
 
-    TRACE("args %p\n", args);
+    TRACE("args %p %s\n", args,SONAME_LIBSDL2);
 
     options = (struct bus_options *)args;
 
     if (!(sdl_handle = dlopen(SONAME_LIBSDL2, RTLD_NOW)))
     {
         WARN("could not load %s\n", SONAME_LIBSDL2);
-        return STATUS_UNSUCCESSFUL;
+        sdl_handle = dlopen("libSDL2-2.0.so.0", RTLD_NOW);
+        if(!sdl_handle) sdl_handle = dlopen("libSDL2.so", RTLD_NOW);
+        if(!sdl_handle)return STATUS_UNSUCCESSFUL;
     }
 #define LOAD_FUNCPTR(f)                          \
     if ((p##f = dlsym(sdl_handle, #f)) == NULL)  \
