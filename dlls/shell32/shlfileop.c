@@ -1189,7 +1189,11 @@ static DWORD do_copy(FILE_OPERATION *op, const FILE_ENTRY *from, const FILE_ENTR
             debugstr_w(from->szFullPath), debugstr_w(to->szFullPath), op->req->fFlags, append_file_name);
 
     /* Determine target path. */
-    wcscpy(target_dir, to->szDirectory);
+    if(to->szDirectory){
+    	wcscpy(target_dir, to->szDirectory);
+    }else{
+    	wcscpy(target_dir, to->szFullPath);
+    }
     wcscpy(target, to->szFullPath);
     if (append_file_name)
     {
